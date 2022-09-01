@@ -1,0 +1,44 @@
+﻿<Window x:Class="CameraInspector.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CameraInspector"
+        mc:Ignorable="d"
+        Title="Camera Inspector Tool 1.0" Height="450" Width="800">
+    <Grid Background="LightGray">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>                  
+        <DockPanel LastChildFill="True" Grid.Column="0" Background="Gray">                            
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                <Label Margin="5 5 0 0" Content="AForge Library" VerticalAlignment="Center"/>
+                <StackPanel Margin="5 5 0 0">
+                    <Label Background="LightGray" Content="Select video source"/>
+                    <ComboBox x:Name="comboBox"
+                              DisplayMemberPath="Name"
+                              ItemsSource="{Binding VideoDevices}"
+                              SelectedItem="{Binding CurrentDevice}"/>
+                </StackPanel>
+                <Button  Margin="5 5 0 0" x:Name="btnAForgeStart" Content="Start" Width="50" Click="btnAForgeStart_Click" />
+                <Button  Margin="5 5 0 0" x:Name="btnAForgeStop" Content="Stop" Width="50" Click="btnAForgeStop_Click"/>
+            </StackPanel>
+            <Image x:Name="AForgeVideoPlayer"/>
+        </DockPanel>       
+        <DockPanel LastChildFill="True" Grid.Column="1" Background="DimGray">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                <Label Margin="5 5 0 0" Content="OpenCVSharp4 Library" VerticalAlignment="Center"/>
+                <StackPanel Margin="5 5 0 0">
+                    <Label Background="LightGray" Content="Select video source"/>
+                    <ComboBox x:Name="cboDevice" 
+                        ItemsSource="{Binding VideoDevices2}"
+                        SelectedItem="{Binding CurrentDevice2}"/>
+                </StackPanel>
+                <Button  Margin="5 5 0 0" x:Name="btnOpenCVStart" Content="Start" Width="50" Click="btnOpenCVStart_Click"/>
+                <Button  Margin="5 5 0 0" x:Name="btnOpenCStop" Content="Stop" Width="50" Click="btnOpenCStop_Click"/>
+            </StackPanel>
+            <Image x:Name="OpenCVVideoPlayer"></Image>
+        </DockPanel>
+    </Grid>
+</Window>
