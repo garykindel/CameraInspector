@@ -219,5 +219,19 @@ namespace CameraInspector
                 Thread.Sleep(30);
             }
         }
+
+        private void btnCamera_Click(object sender, RoutedEventArgs e)
+        {
+            //https://answers.opencv.org/question/41964/cv_cap_prop_settings-working-on-opencvsharp-not-on-opencv/
+            //https://github.com/Kawaian/OpenCvSharp/blob/master/opencv/3.2/include/opencv2/videoio/videoio_c.h
+            // CAP_PROP_SETTINGS Pop up video/camera filter dialog (note: only supported by DSHOW backend currently.
+            // Windows only
+            int CV_CAP_PROP_SETTINGS = 37;
+
+            if (capture != null && !capture.IsDisposed && capture.IsOpened())
+            {
+                capture.Set(CV_CAP_PROP_SETTINGS, 0);
+            }
+        }
     }
 }

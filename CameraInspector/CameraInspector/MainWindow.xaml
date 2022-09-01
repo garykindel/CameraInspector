@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CameraInspector"
         mc:Ignorable="d"
-        Title="Camera Inspector Tool 1.0" Height="450" Width="800">
+        Title="Camera Inspector Tool 1.0" Height="450" Width="950">
     <Grid Background="LightGray">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -37,6 +37,7 @@
                 </StackPanel>
                 <Button  Margin="5 5 0 0" x:Name="btnOpenCVStart" Content="Start" Width="50" Click="btnOpenCVStart_Click"/>
                 <Button  Margin="5 5 0 0" x:Name="btnOpenCStop" Content="Stop" Width="50" Click="btnOpenCStop_Click"/>
+                <Button  Margin="5 5 0 0" x:Name="btnCamera"  Content="Camera Props" Width="90" Click="btnCamera_Click"/>
             </StackPanel>
             <Image x:Name="OpenCVVideoPlayer"></Image>
         </DockPanel>
