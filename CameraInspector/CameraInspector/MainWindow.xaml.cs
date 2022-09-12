@@ -131,6 +131,7 @@ namespace CameraInspector
             {
                 _videoSourceAForge.SignalToStop();
                 _videoSourceAForge.NewFrame -= _videoSourceAForge_NewFrame;
+                OpenCVVideoPlayer.Source = new BitmapImage();
             }
         }
 
@@ -143,6 +144,7 @@ namespace CameraInspector
                     bkgWorker.CancelAsync();
                     bkgWorker.DoWork -= Worker_DoWork;
                     bkgWorker.Dispose();
+                    OpenCVVideoPlayer.Source = new BitmapImage();
                 }
                 if (capture!=null && !capture.IsDisposed) capture.Dispose();
             }
