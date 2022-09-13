@@ -22,6 +22,11 @@ using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.Threading;
 using Window = System.Windows.Window;
+using MaterialDesignColors;
+using MaterialDesignThemes;
+using MaterialDesignThemes.Wpf;
+using System.Web.UI;
+using System.Windows.Controls.Primitives;
 
 namespace CameraInspector
 {
@@ -46,10 +51,15 @@ namespace CameraInspector
         }
         private KeyValuePair<int, string> _currentDevice2;
 
+        public Boolean LightChecked { get; set; }
+        public Boolean DarkChecked { get; set; }
+
         private IVideoSource _videoSourceAForge;
 
         VideoCapture capture;
         BackgroundWorker bkgWorker;
+
+        MaterialDesignThemes.Wpf.Palette _palette;
 
         public MainWindow()
         {
@@ -59,8 +69,28 @@ namespace CameraInspector
             GetVideoDevices_OpenCV();
 
             capture = new VideoCapture();
+            GetTheme();
 
-            this.Closing += MainWindow_Closing;
+
+            LightChecked = true;
+            DarkChecked = false;
+            OnPropertyChanged(nameof(LightChecked));
+            OnPropertyChanged(nameof(DarkChecked));
+
+            this.Closing += MainWindow_Closing;                             
+        }
+
+        void GetTheme()
+        {
+            ResourceDictionary dictionary = Application.Current.Resources.MergedDictionaries.FirstOrDefault(x => x is IMaterialDesignThemeDictionary) ??
+               Application.Current.Resources;
+            ITheme theme = dictionary.GetTheme();
+
+            if (dictionary != null)
+            {
+                theme.SetBaseTheme(LightChecked ? Theme.Light : Theme.Dark);
+                dictionary.SetTheme(theme);
+            }
         }
 
         private void btnAForgeStart_Click(object sender, RoutedEventArgs e)
@@ -234,6 +264,11 @@ namespace CameraInspector
             {
                 capture.Set(CV_CAP_PROP_SETTINGS, 0);
             }
+        }
+
+        private void RadioButton_Click(object sender, RoutedEventArgs e)
+        {
+            GetTheme();
         }
     }
 }

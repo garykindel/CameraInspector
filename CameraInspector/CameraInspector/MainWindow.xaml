@@ -3,41 +3,60 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:CameraInspector"
         mc:Ignorable="d"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
         Title="Camera Inspector Tool 1.0" Height="450" Width="950">
-    <Grid Background="LightGray">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>                  
-        <DockPanel LastChildFill="True" Grid.Column="0" Background="Gray">                            
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+        </Grid.ColumnDefinitions>
+        <StackPanel Margin="5 3 0 0"  Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" >
+            <RadioButton GroupName="BaseTheme" Click="RadioButton_Click" IsChecked="{Binding LightChecked}">
+                <Label Content="Light"/>
+            </RadioButton>
+            <RadioButton GroupName="BaseTheme" Click="RadioButton_Click" IsChecked="{Binding DarkChecked}">
+                <Label Content="Dark"/>
+            </RadioButton>
+        </StackPanel>
+        <DockPanel LastChildFill="True" Grid.Column="0" Grid.Row="1">
+            <StackPanel DockPanel.Dock="Top">
                 <Label Margin="5 5 0 0" Content="AForge Library" VerticalAlignment="Center"/>
-                <StackPanel Margin="5 5 0 0">
-                    <Label Background="LightGray" Content="Select video source"/>
-                    <ComboBox x:Name="comboBox"
+                <StackPanel Orientation="Horizontal" Margin="5 0 0 0">
+                    <StackPanel Margin="5 5 0 0">
+                        <Label Content="Select video source"/>
+                        <ComboBox x:Name="comboBox"
                               DisplayMemberPath="Name"
                               ItemsSource="{Binding VideoDevices}"
                               SelectedItem="{Binding CurrentDevice}"/>
+                    </StackPanel>
+                    <Button Margin="5 5 0 0" x:Name="btnAForgeStart" Content="Start"  Click="btnAForgeStart_Click" />
+                    <Button Margin="5 5 0 0" x:Name="btnAForgeStop" Content="Stop" Click="btnAForgeStop_Click"/>
                 </StackPanel>
-                <Button  Margin="5 5 0 0" x:Name="btnAForgeStart" Content="Start" Width="50" Click="btnAForgeStart_Click" />
-                <Button  Margin="5 5 0 0" x:Name="btnAForgeStop" Content="Stop" Width="50" Click="btnAForgeStop_Click"/>
             </StackPanel>
             <Image x:Name="AForgeVideoPlayer"/>
-        </DockPanel>       
-        <DockPanel LastChildFill="True" Grid.Column="1" Background="DimGray">
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+        </DockPanel>
+        <DockPanel LastChildFill="True" Grid.Column="1" Grid.Row="1">
+            <StackPanel DockPanel.Dock="Top">
                 <Label Margin="5 5 0 0" Content="OpenCVSharp4 Library" VerticalAlignment="Center"/>
-                <StackPanel Margin="5 5 0 0">
-                    <Label Background="LightGray" Content="Select video source"/>
-                    <ComboBox x:Name="cboDevice" 
-                        ItemsSource="{Binding VideoDevices2}"
-                        SelectedItem="{Binding CurrentDevice2}"/>
+                <StackPanel Orientation="Horizontal" Margin="5 0 0 0">
+                    <StackPanel Margin="5 5 0 0">
+                        <Label Content="Select video source"/>
+                        <ComboBox x:Name="cboDevice" 
+                            ItemsSource="{Binding VideoDevices2}"
+                            SelectedItem="{Binding CurrentDevice2}"/>
+                    </StackPanel>
+                    <Button  Margin="5 5 0 0" x:Name="btnOpenCVStart" Content="Start" Click="btnOpenCVStart_Click"/>
+                    <Button  Margin="5 5 0 0" x:Name="btnOpenCStop" Content="Stop" Click="btnOpenCStop_Click"/>
+                    <Button  Margin="5 5 0 0" x:Name="btnCamera"  Content="Camera Props" Click="btnCamera_Click"/>
                 </StackPanel>
-                <Button  Margin="5 5 0 0" x:Name="btnOpenCVStart" Content="Start" Width="50" Click="btnOpenCVStart_Click"/>
-                <Button  Margin="5 5 0 0" x:Name="btnOpenCStop" Content="Stop" Width="50" Click="btnOpenCStop_Click"/>
-                <Button  Margin="5 5 0 0" x:Name="btnCamera"  Content="Camera Props" Width="90" Click="btnCamera_Click"/>
             </StackPanel>
             <Image x:Name="OpenCVVideoPlayer"></Image>
         </DockPanel>
