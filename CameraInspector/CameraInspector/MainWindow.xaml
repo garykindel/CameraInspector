@@ -1,14 +1,17 @@
 ﻿<Window x:Class="CameraInspector.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"        
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ControlLib="clr-namespace:ControlLib;assembly=NumericUpDown"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:CameraInspector"
         mc:Ignorable="d"
         Background="{DynamicResource MaterialDesignPaper}"
-        FontFamily="{DynamicResource MaterialDesignFont}"
-        Title="Camera Inspector Tool 1.0" Height="450" Width="950">
+        FontFamily="{DynamicResource MaterialDesignFont}"        
+        Title="Camera Inspector Tool 1.0" Height="600" Width="1100
+        
+        ">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -56,6 +59,42 @@
                     <Button  Margin="5 5 0 0" x:Name="btnOpenCVStart" Content="Start" Click="btnOpenCVStart_Click"/>
                     <Button  Margin="5 5 0 0" x:Name="btnOpenCStop" Content="Stop" Click="btnOpenCStop_Click"/>
                     <Button  Margin="5 5 0 0" x:Name="btnCamera"  Content="Camera Props" Click="btnCamera_Click"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel DockPanel.Dock="Top">
+                <Label Margin="5 5 0 0" Content="TIC Controller integration" VerticalAlignment="Center"/>
+                <StackPanel Name="spControls" Orientation="Horizontal" Margin="5 0 0 0">
+                    <Label Content="Step Mode:"/>
+                    <RadioButton Tag="0" Margin="5 0 0 0" GroupName="StepMode" Content="Full"   VerticalContentAlignment="Center"/>
+                    <RadioButton Tag="1" Margin="7 0 0 0" GroupName="StepMode" Content="Half"   VerticalContentAlignment="Center"/>
+                    <RadioButton Tag="2" Margin="7 0 0 0" GroupName="StepMode" Content="1/4" IsChecked="True" VerticalContentAlignment="Center"/>
+                    <RadioButton Tag="3" Margin="7 0 0 0" GroupName="StepMode" Content="1/8"   VerticalContentAlignment="Center"/>
+                    <RadioButton Tag="4" Margin="7 0 0 0" GroupName="StepMode" Content="1/16"   VerticalContentAlignment="Center"/>
+                    <RadioButton Tag="5" Margin="7 0 0 0" GroupName="StepMode" Content="1/32"  VerticalContentAlignment="Center"/>
+                    <RadioButton Tag="7" Margin="7 0 0 0" GroupName="StepMode" Content="1/64"   VerticalContentAlignment="Center"/>
+                    <RadioButton Tag="8" Margin="7 0 0 0" GroupName="StepMode" Content="1/128"   VerticalContentAlignment="Center"/>
+                    <RadioButton Tag="9" Margin="7 0 0 0" GroupName="StepMode" Content="1/256"   VerticalContentAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="5 0 0 0">
+                    <Label Content="Steps" VerticalContentAlignment="Center"/>
+                    <ControlLib:NumericUpDown Name="UpSteps" Margin="3 0 0 0" Value="3" Increment="1" MaxValue="10000" Width="50" />
+                    <Label Content="Stop At" VerticalContentAlignment="Center"/>
+                    <ControlLib:NumericUpDown Name="UpStop" Margin="3 0 0 0" Value="1000" Increment="1" MaxValue="10000" Width="50" />
+                    <Label Content="Speed" VerticalContentAlignment="Center"/>
+                    <ControlLib:NumericUpDown Name="UpSpeed" Margin="3 0 0 0" Value="5000000" Increment="1" MaxValue="10000" Width="50" />
+                    <Button Margin="5 0 0 0" Content="Connect" Name="btnConnect" Click="btnConnect_Click"/>
+                    <Button Margin="5 0 0 0" Content="Disconnect" Name="btnDisconnect" Click="btnDisconnect_Click"/>
+                    <Button Margin="5 0 0 0" Content="Start" Name="btnStart" Click="btnStart_Click"/>
+                    <Button Margin="3 0 0 0" Content="Stop" Name="btnStop" Click="btnStop_Click"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="5 0 0 0">
+                    <Label Content="Camera:"/>
+                    <TextBlock Margin="2 0 0 0" Name="txtStatus" Text="Select camera" VerticalAlignment="Center"/>
+                    <Label Content="Tic:"/>
+                    <TextBlock Margin="2 0 0 0" VerticalAlignment="Center"  Name="txtTicStatus" Text="Not connected" />
+                    <Label Content="Error:"/>
+                    <TextBlock Margin="0" VerticalAlignment="Center"  Name="txtError" Text="" />
+                    <TextBlock Margin="0" VerticalAlignment="Center"  Name="txtActivity" Text="" />
                 </StackPanel>
             </StackPanel>
             <Image x:Name="OpenCVVideoPlayer"></Image>
