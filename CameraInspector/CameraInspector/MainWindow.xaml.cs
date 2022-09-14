@@ -439,8 +439,9 @@ namespace CameraInspector
             if (_videoSourceAForge != null && _videoSourceAForge.IsRunning)
             {
                 _videoSourceAForge.SignalToStop();
-                _videoSourceAForge.NewFrame -= _videoSourceAForge_NewFrame;
-                OpenCVVideoPlayer.Source = new BitmapImage();
+                _videoSourceAForge.NewFrame -= _videoSourceAForge_NewFrame;               
+                this.AForgeVideoPlayer.Source = new BitmapImage();
+                
             }
         }
 
@@ -568,6 +569,26 @@ namespace CameraInspector
         private void btnStop_Click(object sender, RoutedEventArgs e)
         {
             StopImageCapture();
+        }
+
+        private void Expander_Expanded(object sender, RoutedEventArgs e)
+        {
+            this.grdMain.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
+        }
+
+        private void Expander_Collapsed(object sender, RoutedEventArgs e)
+        {
+            this.grdMain.ColumnDefinitions[0].Width = new GridLength(0, GridUnitType.Auto);
+        }
+
+        private void expOpenCVSharp4_Collapsed(object sender, RoutedEventArgs e)
+        {
+            this.grdMain.ColumnDefinitions[1].Width = new GridLength(0, GridUnitType.Auto);
+        }
+
+        private void expOpenCVSharp4_Expanded(object sender, RoutedEventArgs e)
+        {
+            this.grdMain.ColumnDefinitions[1].Width = new GridLength(1, GridUnitType.Star);
         }
     }
 }
