@@ -96,7 +96,7 @@
                     <Label Content="Stop At" VerticalContentAlignment="Center"/>
                     <ControlLib:NumericUpDown Name="UpStop" Margin="3 0 0 0" Value="1000" Increment="1" MaxValue="10000" Width="50" />
                     <Label Content="Speed" VerticalContentAlignment="Center"/>
-                    <ControlLib:NumericUpDown Name="UpSpeed" Margin="3 0 0 0" Value="5000000" Increment="1" MaxValue="10000" Width="50" />
+                    <ControlLib:NumericUpDown Name="UpSpeed" Margin="3 0 0 0" Value="5000000" Increment="1" MaxValue="10000" Width="50"/>
                     <Button Margin="5 0 0 0" Content="Connect" Name="btnConnect" Click="btnConnect_Click"/>
                     <Button Margin="5 0 0 0" Content="Disconnect" Name="btnDisconnect" Click="btnDisconnect_Click"/>
                     <Button Margin="5 0 0 0" Content="Start" Name="btnStart" Click="btnStart_Click"/>
@@ -112,8 +112,12 @@
                     <TextBlock Margin="0" VerticalAlignment="Center"  Name="txtActivity" Text="" />
                 </StackPanel>
             </StackPanel>
-            <Image x:Name="OpenCVVideoPlayer"></Image>
-        </DockPanel>
+                <Viewbox VerticalAlignment="Top" HorizontalAlignment="Stretch" Stretch="Uniform" StretchDirection="Both">
+                    <Viewbox Stretch="Uniform" Width="Auto" Height="Auto">
+                        <Image Stretch="Uniform" x:Name="OpenCVVideoPlayer"></Image>
+                    </Viewbox>
+                </Viewbox>
+            </DockPanel>
         </Expander>
     </Grid>
 </Window>
