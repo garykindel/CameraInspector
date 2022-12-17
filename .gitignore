@@ -118,3 +118,5 @@ VisualStudioToolsManifest.xml
 /CameraInspector/packages/LibUsbDotNet.2.2.29/lib/netstandard2.0/LibUsbDotNet.LibUsbDotNet.pdb
 /CameraInspector/CameraInspector/bin/Debug/LibUsbDotNet.LibUsbDotNet.dll
 /CameraInspector/CameraInspector/bin/Debug/LibUsbDotNet.LibUsbDotNet.pdb
+GeneratedInternalTypeHelper.g.cs
+Debug

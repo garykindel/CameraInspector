@@ -30,6 +30,7 @@ using System.Windows.Controls.Primitives;
 using Control = System.Windows.Controls.Control;
 using System.Net.NetworkInformation;
 using System.IO;
+using LibUsbDotNet.Main;
 
 namespace CameraInspector
 {
@@ -54,6 +55,8 @@ namespace CameraInspector
         }
         private KeyValuePair<int, string> _currentDevice2;
 
+        public PRODUCT_ID SelectedControlType { get; set; }
+
         public Boolean LightChecked { get; set; }
         public Boolean DarkChecked { get; set; }
 
@@ -70,7 +73,7 @@ namespace CameraInspector
         bool m_captureImages = false;
         bool m_movestage = false;
         bool m_processing = false;
-        int m_stepmode = 0;
+        int m_stepmode = -1;
         int m_currentImageCount = 0;
 
         private int stepInterval = 3;
@@ -126,13 +129,23 @@ namespace CameraInspector
                 {
                     drcTimer = new System.Windows.Threading.DispatcherTimer();
                     drcTimer.Tick += DrcTimer_Tick;
-                    drcTimer.Interval = new TimeSpan(0, 0, 0, 0, 30);
+
+                    drcTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
                     drcTimer.Start();
 
+                    m_tic = new tic();
 
-                    m_connected = m_tic.open(tic.PRODUCT_ID.T36V4);
+                    if (m_stepmode == -1) SetStepMode(2);
+
+
+                    tic.PRODUCT_ID? wControlType = (tic.PRODUCT_ID)Enum.Parse(typeof(tic.PRODUCT_ID), SelectedControlType.ToString(), true);
+                    if (!wControlType.HasValue)
+                    {
+                        txtError.Text ="Controller not found";
+                        return;
+                    }
+                    m_connected = m_tic.open((tic.PRODUCT_ID)wControlType);
                     m_tic.clear_driver_error();
-                    SetStepMode();
                     m_tic.energize();
                     m_tic.exit_safe_start();
 
@@ -146,7 +159,11 @@ namespace CameraInspector
                     m_tic.set_target_position(0);
                     m_tic.set_step_mode(m_stepmode);
 
-                    if (m_connected) txtTicStatus.Text = "Connected to tic.PRODUCT_ID.T36V4";
+                    if (m_connected)
+                    {                        
+                        txtTicStatus.Text = string.Format("Connected to {0}", SelectedControlType.ToString());
+                        txtError.Text = "";
+                    }
                 }
                 //RefreshTicInfo();
             }
@@ -169,7 +186,7 @@ namespace CameraInspector
                 m_tic.deenergize();
                 m_tic.close();
                 m_connected = false;
-                if (!m_connected) txtTicStatus.Text = "Disconnected from tic.PRODUCT_ID.T36V4";
+                if (!m_connected) txtTicStatus.Text = string.Format("Disconnected from {0}", SelectedControlType.ToString());
                 txtActivity.Text = "";
             }
             catch (Exception ex)
@@ -226,21 +243,22 @@ namespace CameraInspector
             RefreshTicInfo();
         }
 
-        void SetStepMode()
+        void SetStepMode(object param)
         {
-            foreach (Control control in this.spControls.Children)
+            try
             {
-                if ((control is RadioButton))
+                if (param != null)
                 {
-                    if ((control as RadioButton).IsChecked.HasValue && ((bool)(control as RadioButton).IsChecked))
+                    m_stepmode = Convert.ToInt32(param);
+                    if (m_tic != null && m_connected)
                     {
-                        m_stepmode = Convert.ToInt32((control as RadioButton).Tag);
-                        if (m_tic != null && m_connected)
-                        {
-                            m_tic.set_step_mode(m_stepmode);
-                        }
+                        m_tic.set_step_mode(m_stepmode);
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                txtError.Text = ex.Message;
             }
         }
 
@@ -249,7 +267,7 @@ namespace CameraInspector
             if (m_connected)
             {
                 m_tic.reset_command_timeout();
-                m_tic.get_variables();
+                m_tic.get_variables(true);
                 m_tic.get_status_variables(true);
 
                 var sb = new StringBuilder();
@@ -263,7 +281,7 @@ namespace CameraInspector
                     }
                 }
                 ticStatus = sb.ToString();
-                txtTicStatus.Text = string.Format("Op Status: {0} Err: {1} Step Mode: {2}", m_tic.status_vars.operation_state, m_tic.status_vars.string_error_status, m_tic.vars.step_mode);
+                txtTicStatus.Text = string.Format("Op Status: {0} Err: {1} Step Mode: {2}  Model: {3}", m_tic.status_vars.operation_state, m_tic.status_vars.string_error_status, m_tic.vars.step_mode, SelectedControlType.ToString());
 
                 sb = new StringBuilder();
                 foreach (var prop in m_tic.vars.GetType().GetProperties())
@@ -589,6 +607,11 @@ namespace CameraInspector
         private void expOpenCVSharp4_Expanded(object sender, RoutedEventArgs e)
         {
             this.grdMain.ColumnDefinitions[1].Width = new GridLength(1, GridUnitType.Star);
+        }
+
+        private void RadioButton_Click_1(object sender, RoutedEventArgs e)
+        {
+            SetStepMode((sender as RadioButton).Tag);
         }
     }
 }

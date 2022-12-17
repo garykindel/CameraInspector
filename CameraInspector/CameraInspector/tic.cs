@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -897,4 +898,22 @@ namespace CameraInspector
 
 
     }
+
+    [TypeConverter(typeof(EnumDescriptionTypeConverter))]
+    public enum PRODUCT_ID
+    {
+        [Description("T825")]
+        T825 = 179,
+        [Description("T834")]
+        T834 = 181,
+        [Description("T500")]
+        T500 = 189,
+        [Description("N825")]
+        N825 = 0x00C3,
+        [Description("T249")]
+        T249 = 0x00C9,
+        [Description("T36V4")]
+        T36V4 = 0x00CB,
+    }
+
 }

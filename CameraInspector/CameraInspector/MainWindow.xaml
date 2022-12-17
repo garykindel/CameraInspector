@@ -80,15 +80,15 @@
                 <Label Margin="5 5 0 0" Content="TIC Controller integration" VerticalAlignment="Center"/>
                 <StackPanel Name="spControls" Orientation="Horizontal" Margin="5 0 0 0">
                     <Label Content="Step Mode:"/>
-                    <RadioButton Tag="0" Margin="5 0 0 0" GroupName="StepMode" Content="Full"   VerticalContentAlignment="Center"/>
-                    <RadioButton Tag="1" Margin="7 0 0 0" GroupName="StepMode" Content="Half"   VerticalContentAlignment="Center"/>
-                    <RadioButton Tag="2" Margin="7 0 0 0" GroupName="StepMode" Content="1/4" IsChecked="True" VerticalContentAlignment="Center"/>
-                    <RadioButton Tag="3" Margin="7 0 0 0" GroupName="StepMode" Content="1/8"   VerticalContentAlignment="Center"/>
-                    <RadioButton Tag="4" Margin="7 0 0 0" GroupName="StepMode" Content="1/16"   VerticalContentAlignment="Center"/>
-                    <RadioButton Tag="5" Margin="7 0 0 0" GroupName="StepMode" Content="1/32"  VerticalContentAlignment="Center"/>
-                    <RadioButton Tag="7" Margin="7 0 0 0" GroupName="StepMode" Content="1/64"   VerticalContentAlignment="Center"/>
-                    <RadioButton Tag="8" Margin="7 0 0 0" GroupName="StepMode" Content="1/128"   VerticalContentAlignment="Center"/>
-                    <RadioButton Tag="9" Margin="7 0 0 0" GroupName="StepMode" Content="1/256"   VerticalContentAlignment="Center"/>
+                    <RadioButton Tag="0" Margin="5 0 0 0" GroupName="StepMode" Content="Full"   VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
+                    <RadioButton Tag="1" Margin="7 0 0 0" GroupName="StepMode" Content="Half"   VerticalContentAlignment="Center"  Click="RadioButton_Click_1"/>
+                        <RadioButton Tag="2" Margin="7 0 0 0" GroupName="StepMode" Content="1/4" IsChecked="True" VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
+                        <RadioButton Tag="3" Margin="7 0 0 0" GroupName="StepMode" Content="1/8"   VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
+                        <RadioButton Tag="4" Margin="7 0 0 0" GroupName="StepMode" Content="1/16"   VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
+                        <RadioButton Tag="5" Margin="7 0 0 0" GroupName="StepMode" Content="1/32"  VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
+                        <RadioButton Tag="7" Margin="7 0 0 0" GroupName="StepMode" Content="1/64"   VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
+                        <RadioButton Tag="8" Margin="7 0 0 0" GroupName="StepMode" Content="1/128"   VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
+                        <RadioButton Tag="9" Margin="7 0 0 0" GroupName="StepMode" Content="1/256"   VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="5 0 0 0">
                     <Label Content="Steps" VerticalContentAlignment="Center"/>
@@ -97,6 +97,9 @@
                     <ControlLib:NumericUpDown Name="UpStop" Margin="3 0 0 0" Value="1000" Increment="1" MaxValue="10000" Width="50" />
                     <Label Content="Speed" VerticalContentAlignment="Center"/>
                     <ControlLib:NumericUpDown Name="UpSpeed" Margin="3 0 0 0" Value="5000000" Increment="1" MaxValue="10000" Width="50"/>
+                        <ComboBox Margin="3 0 0 0" MinWidth="80"
+                              ItemsSource="{Binding Source={local:EnumBindingSource {x:Type local:PRODUCT_ID}}}" 
+                              SelectedItem="{Binding SelectedControlType}"/>
                     <Button Margin="5 0 0 0" Content="Connect" Name="btnConnect" Click="btnConnect_Click"/>
                     <Button Margin="5 0 0 0" Content="Disconnect" Name="btnDisconnect" Click="btnDisconnect_Click"/>
                     <Button Margin="5 0 0 0" Content="Start" Name="btnStart" Click="btnStart_Click"/>
