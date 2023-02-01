@@ -62,10 +62,13 @@ namespace CameraInspector
 
         private IVideoSource _videoSourceAForge;
 
-        VideoCapture capture;
-        BackgroundWorker bkgWorker;
+        //VideoCapture capture;
+        private WebcamStreaming _webcamStreaming;
+        //BackgroundWorker bkgWorker;
 
-        internal System.Windows.Threading.DispatcherTimer drcTimer;
+        public BitmapImage FrameImageSource { get; set; }
+
+        //internal System.Windows.Threading.DispatcherTimer drcTimer;
         tic m_tic;
 
         bool m_saveimage = false;
@@ -94,7 +97,7 @@ namespace CameraInspector
             GetVideoDevices_AFORGE();
             GetVideoDevices_OpenCV();
 
-            capture = new VideoCapture();
+            //capture = new VideoCapture();
            
             LightChecked = true;
             DarkChecked = false;
@@ -127,11 +130,11 @@ namespace CameraInspector
             {
                 if (!m_connected)
                 {
-                    drcTimer = new System.Windows.Threading.DispatcherTimer();
-                    drcTimer.Tick += DrcTimer_Tick;
+                    //drcTimer = new System.Windows.Threading.DispatcherTimer();
+                    //drcTimer.Tick += DrcTimer_Tick;
 
-                    drcTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
-                    drcTimer.Start();
+                    //drcTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
+                    //drcTimer.Start();
 
                     m_tic = new tic();
 
@@ -178,11 +181,11 @@ namespace CameraInspector
         {
             try
             {
-                if (drcTimer != null)
-                {
-                    drcTimer.Stop();
-                    drcTimer.Tick -= DrcTimer_Tick;
-                }
+                //if (drcTimer != null)
+                //{
+                //    drcTimer.Stop();
+                //    drcTimer.Tick -= DrcTimer_Tick;
+                //}
                 m_tic.deenergize();
                 m_tic.close();
                 m_connected = false;
@@ -195,53 +198,55 @@ namespace CameraInspector
             }
         }
 
-        private void DrcTimer_Tick(object sender, EventArgs e)
-        {
-            // Current and target are not matching.
-            // NEED TO REWORK
+        #region timer code
+        //private void DrcTimer_Tick(object sender, EventArgs e)
+        //{
+        //    // Current and target are not matching.
+        //    // NEED TO REWORK
 
-            // Initial state: m_captureImages true  m_processing false
+        //    // Initial state: m_captureImages true  m_processing false
 
 
-            if (m_connected && m_tic != null)
-            {
-                if (m_captureImages)
-                {
-                    if (!string.IsNullOrEmpty(m_tic.get_error_status())) m_tic.clear_driver_error();
+        //    if (m_connected && m_tic != null)
+        //    {
+        //        if (m_captureImages)
+        //        {
+        //            if (!string.IsNullOrEmpty(m_tic.get_error_status())) m_tic.clear_driver_error();
 
-                    if (!m_processing)
-                    {
-                        m_currentImageCount++;
-                        m_processing = true;
-                        m_tic.set_target_position(m_tic.vars.current_position + Convert.ToInt32(UpSteps.Value));
-                        m_tic.wait_for_move_complete();
-                        if (capture != null && capture.IsOpened())
-                        {
-                            if (m_saveimage)
-                            {
-                                Saveshot();
-                            }
-                            else
-                            {
-                                //Takeshot(m_param);
-                            }
-                        }
-                        //Task.Delay(StepDelay).Wait();
-                        m_processing = false;
-                    }
-                    if (Math.Abs(m_tic.vars.current_position) >= UpStop.Value)
-                    {
-                        m_captureImages = false;
-                    }
-                    txtActivity.Text = string.Format("count: {0} current {1}: target: {2} Limit: {3} {4}", m_currentImageCount, m_tic.vars.current_position, m_tic.vars.target_position, UpStop.Value, System.DateTime.Now.ToString("HH:mm:ss:ffff"));
-                }
-                else
-                {
-                    //txtActivity.Text = string.Format("current {0}: target: {1} Limit: {2} {3}", m_tic.vars.current_position, m_tic.vars.target_position, MoveStageInternal, System.DateTime.Now.ToString("HH:mm:ss:ffff"));
-                }
-            }
-            RefreshTicInfo();
-        }
+        //            if (!m_processing)
+        //            {
+        //                m_currentImageCount++;
+        //                m_processing = true;
+        //                m_tic.set_target_position(m_tic.vars.current_position + Convert.ToInt32(UpSteps.Value));
+        //                m_tic.wait_for_move_complete();
+        //                if (capture != null && capture.IsOpened())
+        //                {
+        //                    if (m_saveimage)
+        //                    {
+        //                        Saveshot();
+        //                    }
+        //                    else
+        //                    {
+        //                        //Takeshot(m_param);
+        //                    }
+        //                }
+        //                //Task.Delay(StepDelay).Wait();
+        //                m_processing = false;
+        //            }
+        //            if (Math.Abs(m_tic.vars.current_position) >= UpStop.Value)
+        //            {
+        //                m_captureImages = false;
+        //            }
+        //            txtActivity.Text = string.Format("count: {0} current {1}: target: {2} Limit: {3} {4}", m_currentImageCount, m_tic.vars.current_position, m_tic.vars.target_position, UpStop.Value, System.DateTime.Now.ToString("HH:mm:ss:ffff"));
+        //        }
+        //        else
+        //        {
+        //            //txtActivity.Text = string.Format("current {0}: target: {1} Limit: {2} {3}", m_tic.vars.current_position, m_tic.vars.target_position, MoveStageInternal, System.DateTime.Now.ToString("HH:mm:ss:ffff"));
+        //        }
+        //    }
+        //    RefreshTicInfo();
+        //}
+        #endregion
 
         void SetStepMode(object param)
         {
@@ -303,8 +308,11 @@ namespace CameraInspector
             {
                 string imagefilePath = @"C:\Users\KindelG\Documents\AmScope\";
                 ImageIndex++;
-                if (capture != null && capture.IsOpened())
+                //if (capture != null && capture.IsOpened())
+                if (_webcamStreaming.VideoCapture != null && !_webcamStreaming.VideoCapture.IsDisposed && _webcamStreaming.VideoCapture.IsOpened())
                 {
+                    GC.Collect();
+                    FrameImageSource = _webcamStreaming.GetImage().ToBitmapImage();
 
                     var fileName = string.Format("{0}.jpg", $"{ImageIndex:0000}");
                     var fullpath = System.IO.Path.Combine(imagefilePath, fileName);
@@ -314,7 +322,8 @@ namespace CameraInspector
                         MemoryStream ms = new MemoryStream();
                         var encoder = new System.Windows.Media.Imaging.JpegBitmapEncoder();
                         encoder.QualityLevel = 100;
-                        encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(OpenCVVideoPlayer.Source as System.Windows.Media.Imaging.BitmapSource));
+                        //encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(OpenCVVideoPlayer.Source as System.Windows.Media.Imaging.BitmapSource));
+                        encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(FrameImageSource as System.Windows.Media.Imaging.BitmapSource));
                         encoder.Save(ms);
                         fileStream.Position = 0;
                         ms.CopyTo(fileStream);
@@ -340,7 +349,8 @@ namespace CameraInspector
         {
             try
             {
-                if (capture != null && capture.IsOpened())
+                //if (capture != null && capture.IsOpened())
+                if (_webcamStreaming.VideoCapture != null && !_webcamStreaming.VideoCapture.IsDisposed && _webcamStreaming.VideoCapture.IsOpened())
                 {
                     m_currentImageCount = 0;
                     if (m_connected)
@@ -416,21 +426,32 @@ namespace CameraInspector
             }
         }
 
-        private void StartCamera_OpenCV()
+        private async void StartCamera_OpenCV()
         {
             StopCamera_OpenCV();
-            Thread.Sleep(30);
-            capture = new VideoCapture();
-            capture.Open(CurrentDevice2.Key, VideoCaptureAPIs.DSHOW);
-            if (!capture.IsOpened())
-            {
-                capture = new VideoCapture();
-                return;
-            }
+            //Thread.Sleep(30);
+            //capture = new VideoCapture();
+            //capture.Open(CurrentDevice2.Key, VideoCaptureAPIs.DSHOW);
+            //if (!capture.IsOpened())
+            //{
+            //    capture = new VideoCapture();
+            //    return;
+            //}
 
-            bkgWorker = new BackgroundWorker { WorkerSupportsCancellation = true };
-            bkgWorker.DoWork += Worker_DoWork;
-            bkgWorker.RunWorkerAsync();
+            if (_webcamStreaming == null || _webcamStreaming.CameraDeviceId != CurrentDevice2.Key)
+            {
+                _webcamStreaming?.Dispose();
+                _webcamStreaming = new WebcamStreaming(
+                    imageControlForRendering: (this.OpenCVVideoPlayer as System.Windows.Controls.Image),
+
+                    cameraDeviceId: CurrentDevice2.Key);
+            }
+            await _webcamStreaming.Start();
+
+
+            // bkgWorker = new BackgroundWorker { WorkerSupportsCancellation = true };
+            // bkgWorker.DoWork += Worker_DoWork;
+            // bkgWorker.RunWorkerAsync();
         }
 
         private void _videoSourceAForge_NewFrame(object sender, NewFrameEventArgs eventArgs)
@@ -463,18 +484,19 @@ namespace CameraInspector
             }
         }
 
-        private void StopCamera_OpenCV()
+        private async void StopCamera_OpenCV()
         {
             try
             {
-                if (bkgWorker != null)
-                {
-                    bkgWorker.CancelAsync();
-                    bkgWorker.DoWork -= Worker_DoWork;
-                    bkgWorker.Dispose();
-                    OpenCVVideoPlayer.Source = new BitmapImage();
-                }
-                if (capture!=null && !capture.IsDisposed) capture.Dispose();
+                if (_webcamStreaming!=null) await _webcamStreaming.Stop();
+                //if (bkgWorker != null)
+                //{
+                //    bkgWorker.CancelAsync();
+                //    bkgWorker.DoWork -= Worker_DoWork;
+                //    bkgWorker.Dispose();
+                //    OpenCVVideoPlayer.Source = new BitmapImage();
+                //}
+                //if (capture!=null && !capture.IsDisposed) capture.Dispose();
             }
             catch { }
         }
@@ -525,30 +547,32 @@ namespace CameraInspector
             StopCamera_OpenCV();
         }
 
-        private void Worker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            var worker = (BackgroundWorker)sender;
-            while (!worker.CancellationPending)
-            {
-                using (var frameMat = capture.RetrieveMat())
-                {
-                    //var rects = cascadeClassifier.DetectMultiScale(frameMat, 1.1, 5, HaarDetectionTypes.ScaleImage, new OpenCvSharp.Size(30, 30));
+        #region worker thread code
+        //private void Worker_DoWork(object sender, DoWorkEventArgs e)
+        //{
+        //    var worker = (BackgroundWorker)sender;
+        //    while (!worker.CancellationPending)
+        //    {
+        //        using (var frameMat = capture.RetrieveMat())
+        //        {
+        //            //var rects = cascadeClassifier.DetectMultiScale(frameMat, 1.1, 5, HaarDetectionTypes.ScaleImage, new OpenCvSharp.Size(30, 30));
 
-                    //foreach (var rect in rects)
-                    //{
-                    //    Cv2.Rectangle(frameMat, rect, Scalar.Red);
-                    //}
+        //            //foreach (var rect in rects)
+        //            //{
+        //            //    Cv2.Rectangle(frameMat, rect, Scalar.Red);
+        //            //}
 
-                    // Must create and use WriteableBitmap in the same thread(UI Thread).
-                    Dispatcher.Invoke(() =>
-                    {
-                        OpenCVVideoPlayer.Source = frameMat.ToWriteableBitmap();
-                    });
-                }
+        //            // Must create and use WriteableBitmap in the same thread(UI Thread).
+        //            Dispatcher.Invoke(() =>
+        //            {
+        //                OpenCVVideoPlayer.Source = frameMat.ToWriteableBitmap();
+        //            });
+        //        }
 
-                Thread.Sleep(30);
-            }
-        }
+        //        Thread.Sleep(30);
+        //    }
+        //}
+        #endregion
 
         private void btnCamera_Click(object sender, RoutedEventArgs e)
         {
@@ -558,10 +582,15 @@ namespace CameraInspector
             // Windows only
             int CV_CAP_PROP_SETTINGS = 37;
 
-            if (capture != null && !capture.IsDisposed && capture.IsOpened())
+            if (_webcamStreaming.VideoCapture != null && !_webcamStreaming.VideoCapture.IsDisposed && _webcamStreaming.VideoCapture.IsOpened())
             {
-                capture.Set(CV_CAP_PROP_SETTINGS, 0);
+                _webcamStreaming.VideoCapture.Set(CV_CAP_PROP_SETTINGS, 0);
             }
+
+            //if (capture != null && !capture.IsDisposed && capture.IsOpened())
+            //{
+            //    capture.Set(CV_CAP_PROP_SETTINGS, 0);
+            //}
         }
 
         private void RadioButton_Click(object sender, RoutedEventArgs e)
