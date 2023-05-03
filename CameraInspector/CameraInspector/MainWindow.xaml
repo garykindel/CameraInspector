@@ -3,15 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"        
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:ControlLib="clr-namespace:ControlLib;assembly=NumericUpDown"
-       
+        xmlns:ControlLib="clr-namespace:ControlLib;assembly=NumericUpDown"       
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:CameraInspector"
         mc:Ignorable="d"
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}"        
         Title="Camera Inspector Tool 1.0" Height="600" Width="922">
-    <Grid Name="grdMain">
+    <Grid Name="grdMain" Background="Gray">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -22,7 +21,7 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Margin="5 3 0 0"  Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" >
+        <StackPanel Background="Gray" Margin="5 3 0 0"  Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" >
             <RadioButton GroupName="BaseTheme" Click="RadioButton_Click" IsChecked="{Binding LightChecked}">
                 <Label Content="Light"/>
             </RadioButton>
@@ -30,7 +29,7 @@
                 <Label Content="Dark"/>
             </RadioButton>
         </StackPanel>
-        <Expander Grid.Column="0" Grid.Row="1" IsExpanded="False" ExpandDirection="Right" Collapsed="Expander_Collapsed" Expanded="Expander_Expanded">
+        <Expander Background="Gray" Grid.Column="0" Grid.Row="1" IsExpanded="False" ExpandDirection="Right" Collapsed="Expander_Collapsed" Expanded="Expander_Expanded">
             <Expander.Header>
                 <Label Content="AForge Library">
                     <Label.LayoutTransform>
@@ -56,7 +55,7 @@
                 <Image x:Name="AForgeVideoPlayer"/>
             </DockPanel>
         </Expander>
-        <Expander Name="expOpenCVSharp4" IsExpanded="True" ExpandDirection="Right" Collapsed="expOpenCVSharp4_Collapsed" Expanded="expOpenCVSharp4_Expanded" Grid.Column="1" Grid.Row="1">
+        <Expander Background="Gray" Name="expOpenCVSharp4" IsExpanded="True" ExpandDirection="Right" Collapsed="expOpenCVSharp4_Collapsed" Expanded="expOpenCVSharp4_Expanded" Grid.Column="1" Grid.Row="1">
             <Expander.Header>
                 <Label Content="OpenCVSharp4 Library">
                     <Label.LayoutTransform>
@@ -68,60 +67,62 @@
                 <StackPanel DockPanel.Dock="Top">
                     <Label Margin="5 5 0 0" Content="OpenCVSharp4 Library" VerticalAlignment="Center"/>
                     <StackPanel Orientation="Horizontal" Margin="5 0 0 0">
+                        <Label VerticalAlignment="Center" FontWeight="Bold" Content="Camera:"/>
                         <StackPanel Margin="5 5 0 0">
                             <Label Content="Select video source"/>
-                            <ComboBox x:Name="cboDevice" 
+                            <ComboBox x:Name="cboDevice" Foreground="Goldenrod"
                             ItemsSource="{Binding VideoDevices2}"
                             SelectedItem="{Binding CurrentDevice2}"/>
                         </StackPanel>
-                        <Button  Margin="5 5 0 0" x:Name="btnOpenCVStart" Content="Start" Click="btnOpenCVStart_Click"/>
-                        <Button  Margin="5 5 0 0" x:Name="btnOpenCStop" Content="Stop" Click="btnOpenCStop_Click"/>
+                        <Button  Margin="5 5 0 0" x:Name="btnOpenCVStart" Content="Connect" Click="btnOpenCVStart_Click"/>
+                        <Button  Margin="5 5 0 0" x:Name="btnOpenCStop" Content="Disconnect" Click="btnOpenCStop_Click"/>
                         <Button  Margin="5 5 0 0" x:Name="btnCamera"  Content="Camera Props" Click="btnCamera_Click"/>
                         <Label VerticalAlignment="Center" Content="Path:"/>
                         <Label VerticalAlignment="Center" Name="lblPath"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="5 0 0 0">
-                        <Label VerticalAlignment="Center" Content="EXIF"   />
+                        <Label VerticalAlignment="Center" FontWeight="Bold" Content="EXIF Meta:"   />
                         <Label VerticalAlignment="Center" Content="Artist:"   />
-                        <TextBox Name="txtArtist" Width="80" MouseDoubleClick="txtArtist_MouseDoubleClick"/>                                               
+                        <TextBox Foreground="DarkRed" Name="txtArtist" Width="80" MouseDoubleClick="txtArtist_MouseDoubleClick"/>                                               
                         <Label VerticalAlignment="Center" Content="Make:"   />
-                        <TextBox Name="txtMake" Width="80"/>
+                        <TextBox Foreground="DarkRed" Name="txtMake" Width="80"/>
                         <Label VerticalAlignment="Center" Content="Model:"   />
-                        <TextBox Name="txtModel" Width="80"/>
+                        <TextBox Foreground="DarkRed" Name="txtModel" Width="80"/>
                     </StackPanel>
                 </StackPanel>
-                <StackPanel DockPanel.Dock="Top">
-                    <Label Margin="5 5 0 0" Content="TIC Controller integration" VerticalAlignment="Center"/>
+                <StackPanel DockPanel.Dock="Top" Margin="0 0 0 5">
+                    <Label Margin="5 5 0 0" FontWeight="Bold" Content="TIC Controller integration" VerticalAlignment="Center"/>
                     <StackPanel Name="spControls" Orientation="Horizontal" Margin="5 0 0 0">
                         <Label Content="Step Mode:"/>
-                        <RadioButton Tag="0" Margin="5 0 0 0" GroupName="StepMode" Content="Full"   VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
-                        <RadioButton Tag="1" Margin="7 0 0 0" GroupName="StepMode" Content="Half"   VerticalContentAlignment="Center"  Click="RadioButton_Click_1"/>
-                        <RadioButton Tag="2" Margin="7 0 0 0" GroupName="StepMode" Content="1/4" IsChecked="True" VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
-                        <RadioButton Tag="3" Margin="7 0 0 0" GroupName="StepMode" Content="1/8"   VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
-                        <RadioButton Tag="4" Margin="7 0 0 0" GroupName="StepMode" Content="1/16"   VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
-                        <RadioButton Tag="5" Margin="7 0 0 0" GroupName="StepMode" Content="1/32"  VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
-                        <RadioButton Tag="7" Margin="7 0 0 0" GroupName="StepMode" Content="1/64"   VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
-                        <RadioButton Tag="8" Margin="7 0 0 0" GroupName="StepMode" Content="1/128"   VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
-                        <RadioButton Tag="9" Margin="7 0 0 0" GroupName="StepMode" Content="1/256"   VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
+                        <RadioButton Tag="0" Margin="5 0 0 0" GroupName="StepMode" Content="Full"   Foreground="DarkRed" VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
+                        <RadioButton Tag="1" Margin="7 0 0 0" GroupName="StepMode" Content="Half"   Foreground="DarkRed" VerticalContentAlignment="Center"  Click="RadioButton_Click_1"/>
+                        <RadioButton Tag="2" Margin="7 0 0 0" GroupName="StepMode" Content="1/4" IsChecked="True" Foreground="DarkRed" VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
+                        <RadioButton Tag="3" Margin="7 0 0 0" GroupName="StepMode" Content="1/8"   Foreground="DarkRed" VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
+                        <RadioButton Tag="4" Margin="7 0 0 0" GroupName="StepMode" Content="1/16"   Foreground="DarkRed" VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
+                        <RadioButton Tag="5" Margin="7 0 0 0" GroupName="StepMode" Content="1/32"  Foreground="DarkRed" VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
+                        <RadioButton Tag="7" Margin="7 0 0 0" GroupName="StepMode" Content="1/64"   Foreground="DarkRed" VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
+                        <RadioButton Tag="8" Margin="7 0 0 0" GroupName="StepMode" Content="1/128"   Foreground="DarkRed" VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
+                        <RadioButton Tag="9" Margin="7 0 0 0" GroupName="StepMode" Content="1/256"  Foreground="DarkRed"  VerticalContentAlignment="Center" Click="RadioButton_Click_1"/>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="5 0 0 0">
+                    <StackPanel Orientation="Horizontal" Margin="5 0 0 5">
                         <Label Content="Steps" VerticalContentAlignment="Center"/>
-                        <Controls:NumericUpDown Name="UpSteps" Margin="3 0 0 0" Value="3" MaxValue="10000" Width="Auto" VerticalContentAlignment="Center" />
+                        <Controls:NumericUpDown Name="UpSteps" Margin="3 0 0 0" Value="3" MaxValue="10000" Width="Auto" Foreground="DarkRed" VerticalContentAlignment="Center" />
                         <Label Content="Stop At" VerticalContentAlignment="Center"/>
-                        <Controls:NumericUpDown Name="UpStop" Margin="3 0 0 0" Value="9000" MaxValue="10000" Width="Auto" VerticalContentAlignment="Center" />
+                        <Controls:NumericUpDown Name="UpStop" Margin="3 0 0 0" Value="9000" MaxValue="10000" Width="Auto" Foreground="DarkRed" VerticalContentAlignment="Center" />
                         <Label Content="Speed" VerticalContentAlignment="Center"/>
-                        <Controls:NumericUpDown Name="UpSpeed" Margin="3 0 0 0" Value="5000000" MaxValue="10000" Width="Auto" VerticalContentAlignment="Center"/>
-                        <ComboBox Margin="3 0 0 0" MinWidth="80"
+                        <Controls:NumericUpDown Name="UpSpeed" Margin="3 0 0 0" Value="5000000" MaxValue="10000" Width="Auto" Foreground="DarkRed" VerticalContentAlignment="Center"/>
+                        <ComboBox Margin="3 0 0 0" MinWidth="80" Foreground="Goldenrod"
                               ItemsSource="{Binding Source={local:EnumBindingSource {x:Type local:PRODUCT_ID}}}" 
                               SelectedItem="{Binding SelectedControlType}"/>
                         <Button Margin="5 0 0 0" Content="Connect" Name="btnConnect" Click="btnConnect_Click"/>
                         <Button Margin="5 0 0 0" Content="Disconnect" Name="btnDisconnect" Click="btnDisconnect_Click"/>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="5 0 0 0">
-                        <Label Content="Specimen ID" VerticalContentAlignment="Center"/>
-                         <TextBox Margin="5 0 5 0" Name="txtID" Width="50" />
+                    <StackPanel Orientation="Horizontal" Margin="5 0 0 5">
+                        <Label Content="Automation:" VerticalContentAlignment="Center" FontWeight="Bold"/> 
+                         <Label Content="Specimen ID" VerticalContentAlignment="Center"/>
+                        <TextBox Foreground="DarkRed" Margin="5 0 5 0" Name="txtID" Width="50" />
                          <Label Content="MagX" VerticalContentAlignment="Center"/>
-                         <TextBox Margin="5 0 5 0" Name="txtMagX" Width="50" />
+                        <TextBox Foreground="DarkRed" Margin="5 0 5 0" Name="txtMagX" Width="50" />
                          <Button Margin="5 0 0 0" Content="Start" Name="btnStart" Click="btnStart_Click"/>
                          <Button Margin="5 0 10 0" Content="Stop" Name="btnStop" Click="btnStop_Click"/>
                          <Button Margin="5 0 0 0" Content="Down" Name="btnMoveDown"  Click="btnMoveDown_Click" />
@@ -129,14 +130,15 @@
                          <Button Margin="5 0 0 0" Content=" Up " Name="btnMoveUp" Click="btnMoveUp_Click"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="5 0 0 0">
+                        <Label Content="Status:"  FontWeight="Bold"/>
                         <Label Content="Camera:"/>
-                        <TextBlock Margin="2 0 0 0" Name="txtStatus" Text="Select camera" VerticalAlignment="Center"/>
+                        <TextBlock Foreground="DarkRed" Margin="2 0 0 0" Name="txtStatus" Text="Select camera" VerticalAlignment="Center"/>
                         <Label Content="Tic:"/>
-                        <TextBlock Margin="2 0 0 0" VerticalAlignment="Center"  Name="txtTicStatus" Text="Not connected" />
+                        <TextBlock Foreground="DarkRed" Margin="2 0 0 0" VerticalAlignment="Center"  Name="txtTicStatus" Text="Not connected" />
                         <Label Content="Error:"/>
-                        <TextBlock Margin="0" VerticalAlignment="Center"  Name="txtError" Text="" />
+                        <TextBlock Foreground="DarkRed" Margin="0" VerticalAlignment="Center"  Name="txtError" Text="" />
                         <Label Content="Activity:"/>
-                        <TextBlock Margin="0" VerticalAlignment="Center"  Name="txtActivity" Text="" />
+                        <TextBlock Foreground="DarkRed" Margin="0" VerticalAlignment="Center"  Name="txtActivity" Text="" />
                     </StackPanel>
                 </StackPanel>
                 <Viewbox VerticalAlignment="Top" HorizontalAlignment="Stretch" Stretch="Uniform" StretchDirection="Both">
