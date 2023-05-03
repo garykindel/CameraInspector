@@ -31,6 +31,10 @@ using Control = System.Windows.Controls.Control;
 using System.Net.NetworkInformation;
 using System.IO;
 using LibUsbDotNet.Main;
+using System.Globalization;
+using System.Web.UI.WebControls;
+using System.Runtime.CompilerServices;
+using ExifLibrary;
 
 namespace CameraInspector
 {
@@ -68,7 +72,7 @@ namespace CameraInspector
 
         public BitmapImage FrameImageSource { get; set; }
 
-        //internal System.Windows.Threading.DispatcherTimer drcTimer;
+        internal System.Windows.Threading.DispatcherTimer drcTimer;
         tic m_tic;
 
         bool m_saveimage = false;
@@ -87,8 +91,12 @@ namespace CameraInspector
 
         string ticStatus;
         string ticVariables;
+        string imagefilePath;
 
         int ImageIndex = 0;
+
+        private string SubfolderInUse { get; set; }
+        public bool UseSubfolders { get; set; }
 
         public MainWindow()
         {
@@ -108,7 +116,10 @@ namespace CameraInspector
 
             m_tic = new tic();
 
-            this.Closing += MainWindow_Closing;                             
+            this.Closing += MainWindow_Closing;
+            imagefilePath = GetDRC4Folder_Captured();
+            lblPath.Content = imagefilePath;
+            UseSubfolders = true;
         }
 
         void GetTheme()
@@ -124,17 +135,37 @@ namespace CameraInspector
             }
         }
 
+        private void TicReconnect()
+        {
+            try
+            {
+                if (m_connected)
+                {
+                    DisconnectUSB();
+                    ConnectUSB();
+                }
+                else
+                {
+                    ConnectUSB();
+                }
+            }
+            catch (Exception ex)
+            {
+                //UIHelper.SendErrorMessage(ex);
+            }
+        }
+
         void ConnectUSB()
         {
             try
             {
                 if (!m_connected)
                 {
-                    //drcTimer = new System.Windows.Threading.DispatcherTimer();
-                    //drcTimer.Tick += DrcTimer_Tick;
+                    drcTimer = new System.Windows.Threading.DispatcherTimer();
+                    drcTimer.Tick += DrcTimer_Tick;
 
-                    //drcTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
-                    //drcTimer.Start();
+                    drcTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
+                    drcTimer.Start();
 
                     m_tic = new tic();
 
@@ -168,7 +199,7 @@ namespace CameraInspector
                         txtError.Text = "";
                     }
                 }
-                //RefreshTicInfo();
+                RefreshTicInfo();
             }
             catch (Exception ex)
             {
@@ -248,6 +279,109 @@ namespace CameraInspector
         //}
         #endregion
 
+        string GetDRC4Folder()
+        {
+            string wPath = string.Empty;
+            try
+            {
+                wPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                if (System.IO.Directory.Exists(wPath))
+                {
+                    if (!System.IO.Directory.Exists(System.IO.Path.Combine(wPath, "DRC 4.0")))
+                    {
+                        System.IO.Directory.CreateDirectory(System.IO.Path.Combine(wPath, "DRC 4.0"));
+                        if (System.IO.Directory.Exists(System.IO.Path.Combine(wPath, "DRC 4.0")))
+                        {
+                            wPath = System.IO.Path.Combine(wPath, "DRC 4.0");
+                        }
+                    }
+                    else
+                    {
+                        wPath = System.IO.Path.Combine(wPath, "DRC 4.0");
+                    }
+                }
+                else
+                {
+                    //LogHelper.ErrorLog(null, "Environment.SpecialFolder.MyDocuments Not Found!");
+                }
+            }
+            catch (Exception ex)
+            {
+                //LogHelper.ErrorLog(ex);
+            }
+            return wPath;
+        }
+        string GetDRC4Folder_Captured()
+        {
+            string wDRC4Path = GetDRC4Folder();
+            string wFullPath = System.IO.Path.Combine(wDRC4Path, "Captured");
+            if (Directory.Exists(wFullPath)) return wFullPath;
+            else
+            {
+                var wResult = Directory.CreateDirectory(wFullPath);
+                return wResult.Exists ? wFullPath : wDRC4Path;
+            }
+        }
+
+        public bool CreateDRCEXIF(string aFilepath)
+        {
+            try
+            {
+                var file = ImageFile.FromFile(aFilepath);
+
+                file.Properties.Set(ExifTag.Artist, string.IsNullOrEmpty(txtArtist.Text) ? "" : txtArtist.Text);
+                file.Properties.Set(ExifTag.Copyright, string.Format("{0} (C) {1}", string.IsNullOrEmpty(txtArtist.Text) ? "" : txtArtist.Text, System.DateTime.Now.Year));
+                file.Properties.Set(ExifTag.Make, string.IsNullOrEmpty(txtMake.Text) ? "" : txtMake.Text);
+                file.Properties.Set(ExifTag.Model, string.IsNullOrEmpty(txtModel.Text) ? "" : txtModel.Text);
+                file.Properties.Set(ExifTag.Software, string.Format("{0} {1}", Application.Current.Resources["AppNameShort"], Application.Current.Resources["AppVersion"]));
+                file.Properties.Set(ExifTag.DateTimeDigitized, System.DateTime.Now);
+                file.Properties.Set(ExifTag.DateTimeOriginal, System.DateTime.Now);
+                file.Save(aFilepath);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                txtError.Text = ex.Message;
+                return false;
+            }
+        }
+
+        void GetImageFromCamera()
+        {
+            Mat frameMat = null;
+            try
+            {
+                if (_webcamStreaming != null && _webcamStreaming.VideoCapture != null && !_webcamStreaming.VideoCapture.IsDisposed && _webcamStreaming.VideoCapture.IsOpened())
+                {
+                    //https://stackoverflow.com/questions/14710838/writeablebitmap-memory-leak
+                    // frameMat.ToBitmapSource() is WriteableBitmap
+                    // Changed binding from Object FrameImageSource
+                    //                  to  BitmapImage FrameImageSource
+                    // THIS STOPPED MEMORY LEAK  9/4/2022                                        
+
+                    //Current code
+                    FrameImageSource = _webcamStreaming.GetImage().ToBitmapImage();
+                    OnPropertyChanged(nameof(FrameImageSource));
+                }
+            }
+            catch (Exception ex)
+            {
+                //UIHelper.SendErrorMessage(ex);
+                // Commented out  9/4/2022
+                //if (ex.Message.Equals("MILERR_WIN32ERROR (Exception from HRESULT: 0x88980003)"))
+                //{
+                //Disconnect();
+                //GC.Collect();
+                //Connect();
+                //}
+
+            }
+            finally
+            {
+                if (frameMat != null && !frameMat.IsDisposed) frameMat.Dispose();
+            }
+        }
+
         void SetStepMode(object param)
         {
             try
@@ -298,20 +432,32 @@ namespace CameraInspector
                     }
                 }
                 ticVariables = sb.ToString();
+
+                txtTicStatus1.Text = ticStatus;
+                txtTicVariables1.Text= ticVariables;
             }
 
         }
 
-        void Saveshot()
+        private void Saveshot()
         {
             try
             {
-                string imagefilePath = @"C:\Users\KindelG\Documents\AmScope\";
+                //string imagefilePath = string.Empty;
+                if (!UseSubfolders || (string.IsNullOrEmpty(SubfolderInUse)))
+                {
+                    imagefilePath = GetDRC4Folder_Captured();
+                }
+                else
+                {
+                    imagefilePath = System.IO.Path.Combine(GetDRC4Folder_Captured(), SubfolderInUse);
+                }                
+
+                if (!Directory.Exists(imagefilePath)) Directory.CreateDirectory(imagefilePath);
                 ImageIndex++;
-                //if (capture != null && capture.IsOpened())
                 if (_webcamStreaming.VideoCapture != null && !_webcamStreaming.VideoCapture.IsDisposed && _webcamStreaming.VideoCapture.IsOpened())
                 {
-                    GC.Collect();
+                    //GC.Collect();
                     FrameImageSource = _webcamStreaming.GetImage().ToBitmapImage();
 
                     var fileName = string.Format("{0}.jpg", $"{ImageIndex:0000}");
@@ -319,68 +465,93 @@ namespace CameraInspector
 
                     using (var fileStream = new FileStream(fullpath, FileMode.Create))
                     {
-                        MemoryStream ms = new MemoryStream();
-                        var encoder = new System.Windows.Media.Imaging.JpegBitmapEncoder();
-                        encoder.QualityLevel = 100;
-                        //encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(OpenCVVideoPlayer.Source as System.Windows.Media.Imaging.BitmapSource));
-                        encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(FrameImageSource as System.Windows.Media.Imaging.BitmapSource));
-                        encoder.Save(ms);
-                        fileStream.Position = 0;
-                        ms.CopyTo(fileStream);
-                        ms.WriteTo(fileStream);
-                        ms.Flush();
-                        fileStream.Flush();
+                        using (MemoryStream ms = new MemoryStream())
+                        {
+                            var encoder = new System.Windows.Media.Imaging.JpegBitmapEncoder
+                            {
+                                QualityLevel = 100
+                            };
+                            encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(FrameImageSource as System.Windows.Media.Imaging.BitmapSource));
+                            encoder.Save(ms);
+                            fileStream.Position = 0;
+                            ms.CopyTo(fileStream);
+                            ms.WriteTo(fileStream);
+                            ms.Flush();
+                            fileStream.Flush();
+                        }
                     }
-                    //ImageHelper.CreateDRCEXIF(fullpath);
-
-                    //OnPropertyChanged("Tabs");
-                    //UIHelper.UpdateMemoryUsage();
-                    txtActivity.Text = String.Format("Captured Image #{0}", $"{ImageIndex:0000}");
+                    CreateDRCEXIF(fullpath);                    
+                    txtActivity.Text = string.Format("Captured Image #{0}", $"{ImageIndex:0000}");
                 }
             }
             catch (Exception ex)
             {
                 txtError.Text = ex.Message;
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
                 throw;
             }
         }
 
         void StartImageCapture()
         {
+            bool error = false;
             try
             {
-                //if (capture != null && capture.IsOpened())
                 if (_webcamStreaming.VideoCapture != null && !_webcamStreaming.VideoCapture.IsDisposed && _webcamStreaming.VideoCapture.IsOpened())
                 {
                     m_currentImageCount = 0;
+
+                    if (UseSubfolders)
+                    {
+                        SubfolderInUse = System.DateTime.Now.ToString("yyyyMMddhhmmssff");
+                        if (!string.IsNullOrEmpty(txtID.Text)) SubfolderInUse = String.Concat(SubfolderInUse, "_#", txtID.Text);
+                        if (!string.IsNullOrEmpty(txtMagX.Text)) SubfolderInUse = String.Concat(SubfolderInUse, "_", txtMagX.Text);
+                    }
+                    else
+                    {
+                        SubfolderInUse = string.Empty;
+                    }
+
+                    TicReconnect();
                     if (m_connected)
                     {
-                        DisconnectUSB();
-                        ConnectUSB();
-
-                        //m_param = param;
                         m_tic.halt_and_hold();
                         m_tic.halt_and_set_position(0);
                         m_tic.set_target_position(0);
-                        m_tic.set_max_speed((int)UpSpeed.Value);
+                        m_tic.set_max_speed(UpSpeed.Value);
                         m_captureImages = true;
                         m_processing = false;
                         m_saveimage = true;
                         ImageIndex = 0;
+                        //m_timer.Stop();
                     }
                     else
                     {
-                        txtTicStatus.Text = "USB TIC controller not connected.";
+                        txtActivity.Text= "USB TIC controller not connected.";
                     }
+                    txtActivity.Text ="Start Auto image capture";
                 }
                 else
                 {
-                    txtStatus.Text = "No camera connected.";
+                    txtActivity.Text ="No camera connect.";
                 }
             }
             catch (Exception ex)
             {
                 txtError.Text = ex.Message;
+                error = true;
+            }
+            finally
+            {
+                if (error)
+                {
+                    if (_webcamStreaming != null && _webcamStreaming.VideoCapture != null && !_webcamStreaming.VideoCapture.IsDisposed)
+                    {
+                        _webcamStreaming.VideoCapture.Dispose();
+                        _webcamStreaming.Dispose();
+                    }
+                }
             }
         }
 
@@ -390,12 +561,18 @@ namespace CameraInspector
             {
                 if (m_connected) m_tic.halt_and_hold();
                 m_captureImages = false;
+                SubfolderInUse = string.Empty;
+                //m_timer.Start();
                 //drcTimer.Stop();
                 //drcTimer.Tick -= DrcTimer_Tick;
             }
             catch (Exception ex)
             {
-                txtError.Text = ex.Message;
+               txtError.Text = ex.Message;
+            }
+            finally
+            {
+                txtActivity.Text ="Image capture stopped.";
             }
         }
 
@@ -428,30 +605,39 @@ namespace CameraInspector
 
         private async void StartCamera_OpenCV()
         {
-            StopCamera_OpenCV();
-            //Thread.Sleep(30);
-            //capture = new VideoCapture();
-            //capture.Open(CurrentDevice2.Key, VideoCaptureAPIs.DSHOW);
-            //if (!capture.IsOpened())
-            //{
-            //    capture = new VideoCapture();
-            //    return;
-            //}
-
-            if (_webcamStreaming == null || _webcamStreaming.CameraDeviceId != CurrentDevice2.Key)
+            try
             {
-                _webcamStreaming?.Dispose();
-                _webcamStreaming = new WebcamStreaming(
-                    imageControlForRendering: (this.OpenCVVideoPlayer as System.Windows.Controls.Image),
 
-                    cameraDeviceId: CurrentDevice2.Key);
+                StopCamera_OpenCV();
+                //Thread.Sleep(30);
+                //capture = new VideoCapture();
+                //capture.Open(CurrentDevice2.Key, VideoCaptureAPIs.DSHOW);
+                //if (!capture.IsOpened())
+                //{
+                //    capture = new VideoCapture();
+                //    return;
+                //}
+
+                if (_webcamStreaming == null || _webcamStreaming.CameraDeviceId != CurrentDevice2.Key)
+                {
+                    _webcamStreaming?.Dispose();
+                    _webcamStreaming = new WebcamStreaming(
+                        imageControlForRendering: (this.OpenCVVideoPlayer as System.Windows.Controls.Image),
+
+                        cameraDeviceId: CurrentDevice2.Key);
+                }
+                await _webcamStreaming.Start();
+
+
+                // bkgWorker = new BackgroundWorker { WorkerSupportsCancellation = true };
+                // bkgWorker.DoWork += Worker_DoWork;
+                // bkgWorker.RunWorkerAsync();
+                txtStatus.Text = _currentDevice2.Value;
             }
-            await _webcamStreaming.Start();
-
-
-            // bkgWorker = new BackgroundWorker { WorkerSupportsCancellation = true };
-            // bkgWorker.DoWork += Worker_DoWork;
-            // bkgWorker.RunWorkerAsync();
+            catch 
+            {
+                txtStatus.Text = "Select camera";
+            }
         }
 
         private void _videoSourceAForge_NewFrame(object sender, NewFrameEventArgs eventArgs)
@@ -499,6 +685,10 @@ namespace CameraInspector
                 //if (capture!=null && !capture.IsDisposed) capture.Dispose();
             }
             catch { }
+            finally
+            {
+                txtStatus.Text = "Select camera";
+            }
         }
 
         private void GetVideoDevices_AFORGE()
@@ -545,6 +735,7 @@ namespace CameraInspector
         private void btnOpenCStop_Click(object sender, RoutedEventArgs e)
         {
             StopCamera_OpenCV();
+            txtStatus.Text = "Select camera";
         }
 
         #region worker thread code
@@ -640,7 +831,132 @@ namespace CameraInspector
 
         private void RadioButton_Click_1(object sender, RoutedEventArgs e)
         {
-            SetStepMode((sender as RadioButton).Tag);
+            SetStepMode((sender as System.Windows.Controls.RadioButton).Tag);
+        }
+
+        private void btnMoveUp_Click(object sender, RoutedEventArgs e)
+        {
+            StageMove(false);
+        }
+
+        private void btnMoveDown_Click(object sender, RoutedEventArgs e)
+        {
+            StageMove(true);
+        }
+
+        private void StageMove(bool down)
+        {
+            try
+            {
+                TicReconnect();
+                if (m_connected && !m_movestage)
+                {
+                    m_movestage = true;
+                    if (!string.IsNullOrEmpty(m_tic.get_error_status())) m_tic.clear_driver_error();
+                    //m_tic.halt_and_hold();                    
+                    //m_tic.set_max_speed(StepSpeed);                   
+                    if (down)
+                    {
+                        m_tic.halt_and_set_position(0);
+                        m_tic.set_target_position(-1 * Int32.Parse(txtMoveInterval.Text));
+                    }
+                    else
+                    {
+                        m_tic.halt_and_set_position(0);
+                        m_tic.set_target_position(Int32.Parse(txtMoveInterval.Text));
+                    }
+
+                    m_tic.wait_for_move_complete();
+                    //m_tic.halt_and_set_position(0);
+                    m_movestage = false;
+                }
+                else
+                {
+                    txtError.Text = "Not connected to TIC Controller";
+                }
+            }
+            catch (Exception ex)
+            {
+                txtError.Text = ex.Message;
+            }
+        }
+
+        private void DrcTimer_Tick(object sender, EventArgs e)
+        {
+            try
+            {
+                if (m_connected && m_tic != null)
+                {
+                    if (m_captureImages)
+                    {
+                        if (!string.IsNullOrEmpty(m_tic.get_error_status())) m_tic.clear_driver_error();
+
+                        if (!m_processing)
+                        {
+                            m_currentImageCount++;
+                            m_processing = true;
+
+                            ///Step 1. Prepare to move stage
+                            DateTime wTime1 = DateTime.Now;
+                            //LogHelper.LogValue("Before Tic move: ", wTime1.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture));
+                            m_tic.set_target_position(m_tic.vars.current_position + UpSteps.Value);
+                            m_tic.wait_for_move_complete();
+
+                            ///Step 2. Prepare to wait
+                            DateTime wTime2 = DateTime.Now;
+                            TimeSpan diff = wTime1 - wTime2;
+                            //LogHelper.LogValue("After m_tic.wait_for_move_complete()(ms): ", diff.TotalMilliseconds.ToString(CultureInfo.InvariantCulture));                                               
+                            //LogHelper.LogValue("Sleep Delay Value (ms)", stepDelay.ToString(CultureInfo.InvariantCulture));
+                            System.Threading.Thread.Sleep(stepDelay);
+
+                            wTime1 = wTime2;
+                            wTime2 = DateTime.Now;
+                            diff = wTime1 - wTime2;
+                            //LogHelper.LogValue("After Sleep Delay (ms):", diff.TotalMilliseconds.ToString(CultureInfo.InvariantCulture));
+
+                            ///Step 3. Take image                                                       
+                            GetImageFromCamera();
+                            if (m_saveimage)
+                            {
+                                Saveshot();
+                            }
+                            else
+                            {
+                                //NOT Currently used
+                                //Takeshot();
+                            }
+                            DateTime wEnd = DateTime.Now;
+                            txtActivity.Text = string.Format("Images captured: {0} {1} ms", m_currentImageCount, (wEnd - wTime1).Milliseconds);
+                            m_processing = false;
+                        }
+                        if (Math.Abs(m_tic.vars.current_position) >= UpStop.Value)
+                        {
+                            m_captureImages = false;
+                        }
+                        txtActivity.Text = string.Format("count: {0} current {1}: target: {2} Limit: {3} {4} Device: {5}", m_currentImageCount, m_tic.vars.current_position, m_tic.vars.target_position, UpStop.Value, DateTime.Now.ToString("HH:mm:ss:ffff", CultureInfo.InvariantCulture), m_tic.product_id.ToString(CultureInfo.InvariantCulture));
+                    }
+                    else
+                    {
+                        txtActivity.Text = string.Format("current {0}: target: {1} Limit: {2} {3} Device: {4}", m_tic.vars.current_position, m_tic.vars.target_position, txtMoveInterval.Text, DateTime.Now.ToString("HH:mm:ss:ffff", CultureInfo.InvariantCulture), m_tic.product_id.ToString(CultureInfo.InvariantCulture));
+
+                    }
+                }                
+            }
+            catch (Exception ex)
+            {
+                txtError.Text = ex.Message;
+            }
+            finally
+            {
+                RefreshTicInfo();
+            }
+        }
+
+        private void txtArtist_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            txtArtist.Text = "Gary Kindel";
+            txtMake.Text = "Amscope";
+            txtModel.Text = "MS1003";
         }
     }
 }

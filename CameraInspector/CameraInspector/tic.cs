@@ -284,13 +284,20 @@ namespace CameraInspector
         const int TIC_CONTROL_PIN_COUNT = 5;
 
 
+        [TypeConverter(typeof(EnumDescriptionTypeConverter))]
         public enum PRODUCT_ID
         {
+            [Description("T825")]
             T825 = 179,
+            [Description("T834")]
             T834 = 181,
+            [Description("T500")]
             T500 = 189,
+            [Description("N825")]
             N825 = 0x00C3,
+            [Description("T249")]
             T249 = 0x00C9,
+            [Description("T36V4")]
             T36V4 = 0x00CB,
         }
         public enum ERRORS
@@ -435,9 +442,8 @@ namespace CameraInspector
             }
             try
             {
-                int transferred;
                 UsbSetupPacket setup = new UsbSetupPacket((byte)request_type, (byte)request, value, index, 0);
-                return MyUsbDevice.ControlTransfer(ref setup, null, 0, out transferred);
+                return MyUsbDevice.ControlTransfer(ref setup, null, 0, out int transferred);
             }
             catch
             {
@@ -456,10 +462,9 @@ namespace CameraInspector
             }
             try
             {
-                int transferred;
                 data = new byte[data_or_length];
                 UsbSetupPacket setup = new UsbSetupPacket((byte)request_type, (byte)request, value, index, data_or_length);
-                bool res = MyUsbDevice.ControlTransfer(ref setup, data, data_or_length, out transferred);
+                bool res = MyUsbDevice.ControlTransfer(ref setup, data, data_or_length, out int transferred);
                 return (res == true && transferred == data_or_length);
             }
             catch
@@ -644,8 +649,7 @@ namespace CameraInspector
             {
                 cmd = TIC_CMD_GET_VARIABLE;
             }
-            byte[] buffer;
-            bool res = transfer(out buffer, request_type: 0xC0, request: cmd, data_or_length: TIC_VARIABLES_SIZE);
+            bool res = transfer(out byte[] buffer, request_type: 0xC0, request: cmd, data_or_length: TIC_VARIABLES_SIZE);
             parse_status_variables(buffer);
             return res;
         }
@@ -686,8 +690,7 @@ namespace CameraInspector
             {
                 cmd = (byte)TIC_CMD_GET_VARIABLE;
             }
-            byte[] buffer;
-            bool res = transfer(out buffer, request_type: 0xC0, request: cmd, data_or_length: TIC_VARIABLES_SIZE);
+            bool res = transfer(out byte[] buffer, request_type: 0xC0, request: cmd, data_or_length: TIC_VARIABLES_SIZE);
             parse_status_variables(buffer);
 
             vars.planning_mode = buffer[TIC_VAR_PLANNING_MODE];
@@ -894,7 +897,7 @@ namespace CameraInspector
         int poll_period = 10;
         public variables vars { get; set; }
         public status_variables status_vars { get; set; }
-        PRODUCT_ID product_id;
+        public PRODUCT_ID product_id;
 
 
     }

@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:CameraInspector"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
@@ -12,6 +13,9 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.BlueGrey.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <sys:String x:Key="AppNameLong">Digital Rockhound's Companion</sys:String>
+            <sys:String x:Key="AppNameShort">DRC</sys:String>
+            <sys:String x:Key="AppVersion">4.11</sys:String>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
