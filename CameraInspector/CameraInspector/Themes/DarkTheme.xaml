@@ -1,0 +1,27 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <SolidColorBrush x:Key="GrayBackgroundColor" Color="DarkSlateGray" />
+    <SolidColorBrush x:Key="BackgroundColor" Color="Black" />
+    <!--<SolidColorBrush x:Key="HighlightColor" Color="#84FFFF" />
+        <SolidColorBrush x:Key="LabelColor" Color="#84FFFF" />
+        <SolidColorBrush x:Key="StatusColor" Color="Yellow" />
+        <SolidColorBrush x:Key="DataFieldColor" Color="#C8DCFF" />
+        <SolidColorBrush x:Key="BlackColor" Color="Black" />-->
+
+    <!--Grids-->
+    <Style x:Key="ContentGrid" TargetType="Grid">
+        <Setter Property="Margin" Value="0 0 0 0 " />
+        <Setter Property="Background" Value="{DynamicResource GrayBackgroundColor}" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+
+    <Style x:Key="MenuGrid" TargetType="Grid">
+        <Setter Property="Margin" Value="0 0 5 0 " />
+        <Setter Property="Background" Value="{DynamicResource BackgroundColor}" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+
+</ResourceDictionary>

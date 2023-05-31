@@ -6,11 +6,9 @@
         xmlns:ControlLib="clr-namespace:ControlLib;assembly=NumericUpDown"       
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:CameraInspector"
-        mc:Ignorable="d"
-        Background="{DynamicResource MaterialDesignPaper}"
-        FontFamily="{DynamicResource MaterialDesignFont}"        
+        mc:Ignorable="d"               
         Title="Camera Inspector Tool 1.0" Height="600" Width="922">
-    <Grid Name="grdMain" Background="Gray">
+    <Grid Name="grdMain" Style="{StaticResource MenuGrid}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -21,15 +19,18 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Background="Gray" Margin="5 3 0 0"  Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" >
+        <StackPanel Margin="5 3 0 0"  Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" >
             <RadioButton GroupName="BaseTheme" Click="RadioButton_Click" IsChecked="{Binding LightChecked}">
                 <Label Content="Light"/>
             </RadioButton>
             <RadioButton GroupName="BaseTheme" Click="RadioButton_Click" IsChecked="{Binding DarkChecked}">
                 <Label Content="Dark"/>
             </RadioButton>
+            <RadioButton GroupName="BaseTheme" Click="RadioButton_Click" IsChecked="{Binding BlueChecked}">
+                <Label Content="Blue"/>
+            </RadioButton>
         </StackPanel>
-        <Expander Background="Gray" Grid.Column="0" Grid.Row="1" IsExpanded="False" ExpandDirection="Right" Collapsed="Expander_Collapsed" Expanded="Expander_Expanded">
+        <Expander Grid.Column="0" Grid.Row="1" IsExpanded="False" ExpandDirection="Right" Collapsed="Expander_Collapsed" Expanded="Expander_Expanded">
             <Expander.Header>
                 <Label Content="AForge Library">
                     <Label.LayoutTransform>
@@ -55,7 +56,7 @@
                 <Image x:Name="AForgeVideoPlayer"/>
             </DockPanel>
         </Expander>
-        <Expander Background="Gray" Name="expOpenCVSharp4" IsExpanded="True" ExpandDirection="Right" Collapsed="expOpenCVSharp4_Collapsed" Expanded="expOpenCVSharp4_Expanded" Grid.Column="1" Grid.Row="1">
+        <Expander Name="expOpenCVSharp4" IsExpanded="True" ExpandDirection="Right" Collapsed="expOpenCVSharp4_Collapsed" Expanded="expOpenCVSharp4_Expanded" Grid.Column="1" Grid.Row="1">
             <Expander.Header>
                 <Label Content="OpenCVSharp4 Library">
                     <Label.LayoutTransform>

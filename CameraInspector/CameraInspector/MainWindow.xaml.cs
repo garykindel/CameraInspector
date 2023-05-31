@@ -22,9 +22,6 @@ using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.Threading;
 using Window = System.Windows.Window;
-using MaterialDesignColors;
-using MaterialDesignThemes;
-using MaterialDesignThemes.Wpf;
 using System.Web.UI;
 using System.Windows.Controls.Primitives;
 using Control = System.Windows.Controls.Control;
@@ -63,6 +60,7 @@ namespace CameraInspector
 
         public Boolean LightChecked { get; set; }
         public Boolean DarkChecked { get; set; }
+        public Boolean BlueChecked { get; set; }
 
         private IVideoSource _videoSourceAForge;
 
@@ -109,8 +107,10 @@ namespace CameraInspector
            
             LightChecked = true;
             DarkChecked = false;
+            BlueChecked = false;
             OnPropertyChanged(nameof(LightChecked));
             OnPropertyChanged(nameof(DarkChecked));
+            OnPropertyChanged(nameof(BlueChecked));
 
             GetTheme();
 
@@ -124,15 +124,32 @@ namespace CameraInspector
 
         void GetTheme()
         {
-            ResourceDictionary dictionary = Application.Current.Resources.MergedDictionaries.FirstOrDefault(x => x is IMaterialDesignThemeDictionary) ??
-               Application.Current.Resources;
-            ITheme theme = dictionary.GetTheme();
-
-            if (dictionary != null)
+            Application.Current.Resources.MergedDictionaries.Clear();
+            if (LightChecked)
             {
-                theme.SetBaseTheme(LightChecked ? Theme.Light : Theme.Dark);
-                dictionary.SetTheme(theme);
+                Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary()
+                {
+                    Source = new Uri("Themes/LightTheme.xaml", UriKind.Relative)
+                });
             }
+            else if (DarkChecked)
+            {
+                Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary()
+                {
+                    Source = new Uri("Themes/DarkTheme.xaml", UriKind.Relative)
+                });
+            }
+            else if (BlueChecked)
+            {
+                Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary()
+                {
+                    Source = new Uri("Themes/BlueTheme.xaml", UriKind.Relative)
+                });
+            }
+            this.InvalidateVisual();
+            this.UpdateLayout();
+            this.UpdateDefaultStyle();
+
         }
 
         private void TicReconnect()
@@ -287,17 +304,17 @@ namespace CameraInspector
                 wPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 if (System.IO.Directory.Exists(wPath))
                 {
-                    if (!System.IO.Directory.Exists(System.IO.Path.Combine(wPath, "DRC 4.0")))
+                    if (!System.IO.Directory.Exists(System.IO.Path.Combine(wPath, "DRC4")))
                     {
-                        System.IO.Directory.CreateDirectory(System.IO.Path.Combine(wPath, "DRC 4.0"));
-                        if (System.IO.Directory.Exists(System.IO.Path.Combine(wPath, "DRC 4.0")))
+                        System.IO.Directory.CreateDirectory(System.IO.Path.Combine(wPath, "DRC4"));
+                        if (System.IO.Directory.Exists(System.IO.Path.Combine(wPath, "DRC4")))
                         {
-                            wPath = System.IO.Path.Combine(wPath, "DRC 4.0");
+                            wPath = System.IO.Path.Combine(wPath, "DRC4");
                         }
                     }
                     else
                     {
-                        wPath = System.IO.Path.Combine(wPath, "DRC 4.0");
+                        wPath = System.IO.Path.Combine(wPath, "DRC4");
                     }
                 }
                 else

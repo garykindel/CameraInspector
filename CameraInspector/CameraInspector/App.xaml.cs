@@ -13,6 +13,7 @@ namespace CameraInspector
     /// </summary>
     public partial class App : Application
     {
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -20,5 +21,7 @@ namespace CameraInspector
             // Set the ShutdownMode property to OnLastWindowClose.
             ShutdownMode = ShutdownMode.OnLastWindowClose;
         }
+
+
     }
 }
