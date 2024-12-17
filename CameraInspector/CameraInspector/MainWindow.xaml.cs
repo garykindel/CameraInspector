@@ -612,7 +612,7 @@ namespace CameraInspector
 
         private void StartCamera_AFORGE()
         {
-            if (CurrentDevice != null)
+            //if (CurrentDevice != null)
             {
                 _videoSourceAForge = new VideoCaptureDevice(CurrentDevice.MonikerString);
                 _videoSourceAForge.NewFrame += _videoSourceAForge_NewFrame;              
